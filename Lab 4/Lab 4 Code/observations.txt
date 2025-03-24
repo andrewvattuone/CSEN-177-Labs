@@ -1,0 +1,49 @@
+Step 1:
+
+When running this program, each thread prints out "Hello from thread" plus it's associated index plus "with thread ID" plus
+the current thread's thread ID. Afterward, a statement saying "Thread " + thread index + " done" for each thread to indicate
+that the thread has terminated. I don't get the same output if I run threadHello multiple times. Usually the "Hello from 
+thread" statements all print out before any of the "Thread done" statements start printing, but sometimes a "Hello from thread"
+statement will print after a few "Thread done" statements have printed (the index of this thread is usually 0, but sometimes
+it's a different number). This might have something to do with how the OS schedules which threads to run, as one thread could be created
+so late that the other threads have already finished. Additionally, several thread indices are printed out multiple times, despite the fact 
+that each of the 20 threads created should have their own unique index (an int from 0 to 19). Different numbers repeat for different
+threads each time I run threadHello.c. This is likely because the address of i is passed in to the function go to print out
+the thread index, as by the time the function go executes, i might've already changed, resulting in an incorrect thread index
+being printed out (and sometimes it's a duplicate of another index since the CPU takes turns executing each thread at a 
+time, so it'll increase i for a little bit, then execute some threads one after the other before i can increase in the main
+thread, causing the duplicates).
+
+When running threadHello.c while also running a demanding process, the output is usually delayed, and sometimes only a few
+or none of the "Hello from thread" statements print. Additionally, the line bash: fork: retry: Resource temporarily unavailable
+prints a few times, sometimes before any of the "Thread done" statements, sometimes after, and sometimes a few before and 
+a few after. This probably happens because the CPU is already using many threads to run the time-consuming program, so it
+can't run all 20 threads in threadHello.c
+
+The parameter arg is a per-thread variable because it's passed in as an argument, so each thread has its own copy. The states of
+these variables will be stored in each individual thread's stack, as they're local (per-thread) variables and that's where
+the local variables of threads are stored. Note however that the parameter passed in happens to be an address, which is
+used to access a shared variable (arg itself though is NOT a shared state variable but a per-thread variable since arg just\
+stores an address, which each thread is given its own copy of when passed in)
+
+The local variable i in main() is a shared-state variable, as the memory of the main thread is still accessible by all other
+threads (so long as an address is passed in to access this variable). In this case, &i is passed into each thread so that
+each thread has direct access to the value of i in main (so if i changes in the main thread, it'll also affect the values
+each thread reads). The compiler stores this variable in the main thread's stack since it's a local variable created in the
+main thread, and not one of the other threads created.
+
+
+Step 2:
+
+Since the second for loop was deleted now only "Hello from thread" statements will print. 19 "Hello from thread" statements
+will always print before the "Main thread done" statement prints. Sometimes only these 19 statements and the main thread done
+statement will print (for a total of 20 lines of output), probably because the main thread returns before the 20th thread gets 
+a chance to execute, so the 20th thread won't execute. Other times right after "main thread done", the 20th thread executes 
+and prints out it's "Hello from thread" statement (probably prints after the main statement since it's delayed). However, this 
+statement is usually printed out twice (for a total of 22 lines of output), both with the same thread ID and index (ID is always 20, 
+never anything different). This might be because the 20th thread is trying to execute while the process is terminating, which 
+might cause undefined behavior (which could cause the thread to print out it's "Hello from thread" statement twice). Very 
+rarely did the 20th thread print out just one "Hello from thread" statement instead of 2 (for a total of 21 lines of output). 
+The same problems of indices being repeated is also present for all of the threads (although the later threads usually have the correct 
+indices, while the earlier threads are more likely to have duplicate or incorrect indices).
+

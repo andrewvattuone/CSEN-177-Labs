@@ -1,0 +1,49 @@
+Step 2:
+
+The 100KB, 1MB, and 10MB files all ran with almost the exact same real, user, and sys time (0.002s or 0.003s for real time 
+and about 0.001s for user and sys time), although the 100KB file ran a tiny bit faster than the other files. The 100MB file 
+ran a bit slower than the other files (0.014s for real time, 0.002s user time, 0.011s sys time), although it was still pretty
+fast. It makes sense that the smaller files can have all their characters read much faster than the larger files since fewer
+read instructions need to be performed to reach the end of the files. Also, either most of or all of the contents of the smaller
+files can fit in the cache, which makes reading them much faster than the 100MB file due to fast memory access. Runtime differences
+seemed to be largest for real and sys runtime, but not much for user runtime.
+
+
+Step 3:
+
+In almost all cases, a larger buffer size decreases runtime, sometimes by a significant amount. The same trends as in step 2
+hold though, with the 100KB file being the fastest, then the 1MB, then the 10MB, and finally the 100MB. It makes sense that
+runtime decsreases as buffer size increases, as larger buffers mean that more characters can be read at a time, leading to
+fewer read operations needed to read all the characters in the file. This means the program spends less time calling read
+functions, so runtime decreases. Once again, runtime differences seemed to be largest for real and sys runtime, but not 
+much for user runtime.
+
+
+Step 4:
+
+Larger files took longer to run like in Step 3, although there was increased runtime for all files due to the write statement
+added, which would increase runtime since it adds extra overhad and required runtime. The trends were mostly similar to the
+trends in Step 3, with larger buffer sizes decreasing the runtime. This makes sense, as larger buffer sizes means that the
+program not only requires less read calls to finish reading the file, but also requires less write calls to write to the output
+file, both of which decrease total overhead and increase runtime. However, the runtime improvements weren't as consistent 
+or as good as the runtime improvements in Step 3, although this really only applied to the smaller files (the 100MB file
+was unaffected by this). This is likely because there are already so few read/write calls needed to completely read from/
+write to the files since they have a small size, so a larger buffer size wouldn't improve runtime as much since it wouldn't
+drastically reduce the total number of read/write calls needed as compared to larger files (ex: if a small file needs only
+4 calls without a larger buffer but with a larger buffer it needs just 2 calls, that's not as much as an improvement if a 
+larger file needs 100 calls and with the buffer it's only 10 or something like that. These aren't actual measured values 
+it's just an explanation of what's probably happening). Runtime differences again seemed to be largest for real and sys runtime,
+while user runtime had virtually no change at all from steps 2 and 3.
+
+Step 5:
+
+As in step 4, larger files took longer to run, and larger buffer sizes generally decreased runtime (although like in Step 4
+the 1MB and 10MB files didn't have as much of a runtime improvement as the 100KB and 100MB files, possibly due to OS caching, which allows smaller files to be stored in memory, minimizing the effect of buffer size changes). Larger numbers of threads
+increased the total runtime, which was especially pronounced in the larger files. This makes sense, as a larger number of 
+threads would require many more CPU resources than the original single-threaded programs would, as the same program is being run
+for up to 64 times and would thus certainly require more time to complete than running the program only once. Note however that
+if we had multi-core CPUs, then threads could be run in parallel which would not increase runtime as much or even decrease
+runtime, but since we only have single-core CPUs threads can't be run in parallel so there's no speed up. User runtime remained 
+quite low for every single file size of every buffer size with every number of threads, although it would slightly increase 
+for larger file sizes and thread numbers, while slightly decrease or remain the same for larger buffer sizes. The largest 
+differences observed were in the real and sys times. 

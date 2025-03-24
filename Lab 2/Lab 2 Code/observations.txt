@@ -1,0 +1,23 @@
+Step 3:
+After running ./step1 with no inputted arguments, I get the following error:
+Segmentation fault (core dumped)
+
+This error occurs because of this statement in line 10: int i, n = atoi(argv[1]). When no arguments are inputted,
+argv[1] does not exist, so when the function tries to access argv[1], it's trying to access memory that doesn't exist,
+which causes the segmentation fault.
+
+
+Step 4:
+When entering a delay of 500, the program prints out all 100 iterations of both loops almost instantaneously, while
+entering a delay of 5000 causes the program to take a second or two to complete all of the iterations of both loops. The 
+difference in execution time occurs because of the usleep funciton, which makes each iteration of each loop wait for the
+inputted number of microseconds before proceeding.
+
+
+Step 6 has the same execution functionality as the code from step 1 (error if nothing inputted, larger numbers inputted
+increases time to complete, etc)
+
+General Observations:
+Processes don't share memory with each other, so if I change one variable in a child process, it won't change it in its
+parent or sibling processes or any other processeses (however, before a child process are created I can create a variable 
+in the parent so that the child has a copy of it, although it can't change the value of that variable in the parent process).

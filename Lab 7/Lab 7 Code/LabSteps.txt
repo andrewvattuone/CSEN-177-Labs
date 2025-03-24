@@ -1,0 +1,57 @@
+//Name: Andrew Vattuone
+//Date:
+//Title: Lab7 – Minix Scheduling
+//Description:
+This lab involved editing the Minix scheduling algorithm so that instead of always picking the first process in the highest priority
+process queue, the scheduling algorithm should have a probability of randomly skipping the current queue and moving on to
+a lower priority queue. You should then run a shell command that's either already slow or has a lot of output using the modified
+scheduling algorithm and note down your observations (it should run slower than normal).
+
+
+Steps:
+First, make sure your VirtualBox is set up properly so that it can run Minix. If not, then follow the steps in lab 6 to
+set everything up properly. After logging in (username: root, your choice of password), type ifconfig into the terminal 
+to get the IP address and then type tcpd ftp in.ftpd &. This allows you to establish a connection between your ECC computer
+and Minix in VirtualBox. Afterward, go to the file browser in your ECC computer, select "Other Locations", and then type
+ftp://<IP>, but replace <IP> with the IP address from ifconfig. This should put you inside the root directory, but if you
+want to view other directories, you should click on the button at the top left of the screen that says "root on <IP>" since
+that allows you to go one directory above. 
+
+Now go back to the Minix terminal. To find the file holding the process scheudling algorithm, you need to use the grep
+command to search for they keyword "pick". Hint: use grep pick /usr/src/*/*, since the file is in a directory inside of the
+src directory. If you can't find it, it's in /usr/src/kernel and called proc.c. Once you find the proc.c file, copy and paste it to 
+your own ECC computer, and open it for editing using a text editor like VSCode (need to edit on the ECC machine since otherwise it 
+might brick Minix and then you'll need to reinstall it). You need to find the pick_proc function and edit that so the scheduling 
+algorithm can be edited. Normally, in pick_process the loop starts with the highest priority job queue and will return the first process 
+inside of it. Otherwise, it'll keep iterating over all the lower priority job queues until it finds a queue with a process that can be returned 
+(if no process is found in any of the queues it returns NULL). Also if a process is billable then it tells the CPU that it used CPU time 
+so that CPU process time can be properly tracked. You need to change the function so that instead of always returning the highest priority
+process, there should be a probability that it skips the current queue and moves on to a lower priority job queue, even if
+there are processes inside the current higher-priority job queue. You should decide the probability that the scheduler 
+moves on to a lower job priority queue. Also before editing run the command ls -R / to see how long it takes to run with the
+unmodified algorithm.
+
+To edit this funciton, I included #include <time.h> at the top, and then used srand(time(NULL)) to set up the seed for
+generating a random number. Inside the for loop, I then stored the result of (rand() % 100) + 1 in an integer variable 
+called skipProb to generate a random number between 1 and 100. Then, I modified the if statement that checks if the 
+current queue is empty to if(!(rp = rdy_head[q]) || skipProb <= 30), which will result in the current priority
+job queue being skipped 30% of the time (since skipProb will be <= 30 on average about 30% of the time since it's a random
+number between 1 and 100), regardless of whether its empty or not (it'll still skip if it's empty though). All other parts
+of the code will work the same. 
+
+Afterward, you should have 2 windows of the ECC file explorer open. In one window, navigate to Minix's /usr/src/kernel (through
+the Other Locations section in the file exploreer), and in the other, pull up the locaiton where proc.c is stored on your
+ECC computer. Then click and drag proc.c from your ECC storage location and drag it into the window with the /usr/src/kernel
+folder and drop it in there, and it'll replace the old proc.c with your new edited proc.c. Note that when I tried just dragging
+and dropping using one window it gives me an error, but for whatever reason using 2 windows works. Then recompile Minix. 
+Navigate to /usr/src and type in the command line: make world. Afterward, type in the command line: shutdown. 
+Then type: exit. Press 2 quickly after typing exit. 
+
+Finally, run this command: ls -R / (or any shell command that's either already slow or has a lot of output). I noticed that
+running this command using the modified scheduling algorithm makes the command seem slower since the wait time for completing
+each job is increased. This makes sense, as higher priority jobs are usually categorized as higher priority since they 
+can be completed quicker and are important for system performance, so randomly skipping over some of these processes to
+execute lower-priority processes instead would increase the overall time taken to complete the command since there would
+be more delays due to important high-priority tasks not getting executed.
+
+My edited code snippet is in editedSnippet.c, which is also in the full edited proc.c file.

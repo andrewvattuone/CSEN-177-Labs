@@ -1,0 +1,40 @@
+Main Observations:
+Step 6:
+The program creates 10 threads, each with an index i from 0-9, with each thread running a function that says "Hello from thread (thread ID)
+with iteration (current thread iteration)" and afterward saying "Thread (current thread iteration) returned" once the thread
+finishes and joins back with the main thread. Generally, the "hello from thread" functions are almost all run at the start 
+before the "Thread returned" statements, although sometimes a few of the "hello from thread" outputs run after a few other
+"Thread returned" statements run. 
+
+Additionally, there's a bug where some of the threads print the same value of i, which shoudn't happen since each thread
+has its own index i. This occurs because the address of the index i is passed into the pthread_create call as an argument, 
+as even though the delay between the time the thread is created and the print statement in the go funciton is executed, 
+it's enough time for the value of i to change in the original thread. This means that when the address of i is dereferenced 
+in the funciton, it could be after i has already been increased by the for loop, resulting in an incorrect index being printed.
+And since all threads share the same value of i since the address of i is passed in to each thread function, this results
+in the same value of i being printed out by multiple threads, as some threads might try to read the value at the address
+of i at the same time and print it out.
+
+Step 7:
+To fix the bug, instead of passing in &i as a function argument to pthread_create, cast i to (void*)(size_t) so you can
+pass in the value of i directly. That way the value printed out by the thread won't change once it's passed in, so the issue
+of the value of i changing and the same value being printed out by multiple different threads will be fixed.
+
+
+Other Observations:
+Step 1:
+Outputs a list of all the files in the current directory.
+
+Step 2:
+Writes user input (the ./step2 and any other arguments) into a pipe and then reads from the pipe to print the input back out, each separated by a space.
+
+Step 3:
+Outputs a list of all the files in the current directory, with each character separated by a space.
+
+Step 4:
+Output is:
+root:x:0:0:root:/root:/bin/bash
+rootbash:x:0:0:root:/root:/bin/bash
+operator:x:11:0:operator:/root:/sbin/nologin
++@rootusers
+

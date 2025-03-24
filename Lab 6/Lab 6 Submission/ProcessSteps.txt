@@ -1,0 +1,58 @@
+//Name: Andrew Vattuone
+//Date: 2/22/25
+//Title: Lab6 – Minix operating system
+//Description: 
+This lab involves downloading MINIX and running it using VirtualBox. The MINX copyright statement should be edited so that
+it includes your name above the original copyright statement. All files should be edited in the ECC OS rather than MINIX
+since it could break MINIX and you might have to recompile it. After the changes are made, MINIX should be recompiled using
+make world, and a few other commands to simulate a full power cycle of the machine, and afterward the edited copyright statement
+should appear when the edited MINIX loads. This lab is useful for learning about how an OS can be edited, how to run different
+OS's on one computer, and how an OS works in general.
+
+
+Steps:
+Start by logging into one of the ECC computers (or use NoMachine to connect virtually). Then look for the VirtualBox app,
+select File, and then select Import Appliance. Then set the Source section to Local File System and the File section to 
+/local/Vbox/minix3-1-7.ova. Then go into Settings and change the MAC Address Policy to: enerate new MAC addresses for all network adapters.
+Click finish afterwards.
+
+Next click on the Settings icon. Make sure that Adapter 1 has Enable Network Adapter is checked, that Attatched is Host-only
+adapter, and that the Name is vboxnet0. Aftewrard, click on the button to start the VM. If you want to you can connect
+your cursor to the VM you can click on the VM box, but if you decide you don't want to then just press Right Ctrl. Also
+it might ask you whether you want to use custom or default MINIX, so just pick one (it'll automatically be default if you
+don't choose). When you're asked to login, the username should be: root. Set the password to whatever you want. 
+
+Type the following command in the command line: ifconfig. This gives you the IP address. Afterward type this command into
+the command line: tcpd ftp in.ftpd &. This will later allow you to transfer files between your ECC computer OS and the
+MINIX OS. Next, go into your ECC computer's file browser, go to Other Locations, and type in the Connect to Server Box:
+ftp://<IP>.  <IP> should be replaced with the ip of the MINIX system you got from the ifconfig command. 
+
+For modifying any files, you should always copy and paste them into your own ECC computer instead of editing them directly
+on the MINIX VM, as this can cause errors that can crash MINIX and you'll need to reinstall it. If you don't know which 
+files you need to change, but you know that these files contain a specific keyword, then type in this command into the 
+MINIX command line: grep <keyword> /dir/*. Note that <keyword> should be replaced with the actual keyword you want to search
+for (no angle brackets included). This command will look for all instances of the keyword inside all files in the dir 
+directory. Note that it'll only search the files directly inside dir - not any files that are inside of directories that
+are inside dir. If you want to search one level deeper, then use /dir/sub/* instead, where sub is the subdirectory located
+inside of dir. Note that you could also use /dir/*/*, and you could keep using more *s if you want to search deeper. Also
+note that if you want to change any file on your own personal computer too and not just MINIX then this also works (as long
+as you can use UNIX-based commands). 
+
+In this case since you want to specifically change the MINX boot loader, the file you're looking for will be in a directory inside 
+of /usr/src. It'll contain this keyword: 2010. Use grep 2010 /usr/src/*/* and it'll show you which file the pattern is 
+located in and which line in the file it occurs on. Then copy and paste the file into your ECC computer and edit it using
+a text editor of your choice (using VSCode is easiest. Just open that up, then click file, click open file, and select the
+file you want to edit). Then scroll down to the line in the boot loader you want to change, and change it. If you just want
+to change the boot-up message, just edit the string containing the message (same line as the line where 2010 is located).
+After editing the file you'll need to copy and paste the file from your ECC computer back into its original location in the
+MINIX OS. You might have trouble just cut and pasting the file. If you do, try opening 2 windows, one with the file's current
+location on your ECC computer and the other with the location where it's supposed to go in MINIX. Then just drag and drop
+the file from the ECC window to the MINIX window. This avoids any errors where it says "can't move file to this folder", which
+for some reason occurred for me when just clicking copy and paste or dragging and dropping in only one window but was fixed
+when I dragged and dropped using both windows. 
+
+Finally, to recompile minix, type in the command line: make world. Afterward, type in the command line: shutdown. 
+Then type: exit. Press 2 quickly after typing exit. After this, you should see the modified boot-up statement. 
+
+
+

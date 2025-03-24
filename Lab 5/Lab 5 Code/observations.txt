@@ -1,0 +1,19 @@
+Step 1:
+
+When running the program, the statement "Thread (thread index) Entered Critical Section.." prints out for the corresponding
+thread, and then sleeps for 1 second before finishing. Afterward, either the same statement for the next thread is printed
+out, or a statement that says "Thread (thread index) returned" is printed out for the current thread index, indicating 
+that the thread has terminated. Sometimes the "Thread (thread index) Entered Critical Section.." statement isn't printed
+in the correct order, probably because the OS scheduled another thread to run in place of the "correct" thread. This also
+delays one or more of the "Thread returned" print statements when this happens, as the main thread needs to wait longer 
+for the delayed thread to terminate before it can continue. After all the threads have terminated, the program prints 
+"Main thread done" and then ends.
+
+threadHello prints out 20 threads instead of 10, and each thread prints out a slightly different statement inside its function
+(includes its threadID, which threadSync doesn't do). Additionally, almost all of threadHello's "hello from thread" statements 
+all execute before any of the threads return since threadHello doesn't make any of its threads sleep (unlike in threadSync, 
+which makes its threads sleep so the termination print statement of a thread often prints out before the "hello from thread"
+statement prints out in other threads). The main difference though is that threadSync uses sempahores when reading its arguments
+and passes in the value i itself rather than an address to i. This prevents threads from printing out any of their "Thread Entered
+Critical Section" functions simultaneously and forces every index to print out exactly once for each corresponding thread, unlike 
+in threadHello, which has a bug where it will often print out the incorrect or duplicate indecies for each thread. 
